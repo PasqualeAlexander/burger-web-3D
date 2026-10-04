@@ -97,6 +97,8 @@ function App() {
 
   const totalPrice = ingredients.reduce((sum, ing) => sum + INGREDIENT_DATA[ing.type].price, 5.0)
 
+  const [isExploding, setIsExploding] = useState(false)
+
   const handleConfirmOrder = () => {
     const newOrder: Order = {
       id: Math.random().toString(36).substr(2, 9),
@@ -104,8 +106,14 @@ function App() {
       price: totalPrice
     }
     setCart((prev) => [...prev, newOrder])
-    setIngredients(DEFAULT_INGREDIENTS)
-    
+
+    // Trigger explosion, then reset after animation finishes
+    setIsExploding(true)
+    setTimeout(() => {
+      setIsExploding(false)
+      setIngredients(DEFAULT_INGREDIENTS)
+    }, 900)
+
     setShowToast(true)
     setTimeout(() => setShowToast(false), 3000)
   }
@@ -131,7 +139,7 @@ function App() {
             shadow-bias={-0.0001}
           />
           
-          <Burger ingredients={ingredients} />
+          <Burger ingredients={ingredients} isExploding={isExploding} />
           
           <ContactShadows position={[0, -0.7, 0]} opacity={0.7} scale={15} blur={2.5} far={4} color="#000000" />
           <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2 + 0.1} minPolarAngle={Math.PI / 6} />
