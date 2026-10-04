@@ -59,9 +59,13 @@ const AnimatedIngredient = ({
     )
   }
 
+  let radius = 1.5;
+  if (['ketchup', 'mustard', 'mayo'].includes(type)) radius = 1.25;
+  if (['onion', 'pickle'].includes(type)) radius = 1.4;
+
   return (
     <mesh ref={meshRef} castShadow receiveShadow>
-      <cylinderGeometry args={[1.5, 1.5, data.height, 64]} />
+      <cylinderGeometry args={[radius, radius, data.height, 64]} />
       <meshPhysicalMaterial {...materialProps} />
     </mesh>
   )

@@ -1,4 +1,4 @@
-export type IngredientType = 'patty' | 'cheese' | 'tomato' | 'lettuce' | 'bacon';
+export type IngredientType = 'patty' | 'cheese' | 'tomato' | 'lettuce' | 'bacon' | 'pickle' | 'onion' | 'ketchup' | 'mustard' | 'mayo';
 
 export interface Ingredient {
   id: string;
@@ -24,4 +24,9 @@ export const INGREDIENT_DATA: Record<IngredientType, IngredientProps> = {
   tomato: { name: 'Tomate', price: 0.5, height: 0.15, color: '#cc1100', roughness: 0.1, metalness: 0.1, clearcoat: 1.0, transmission: 0.2, thickness: 0.5, ior: 1.4 },
   lettuce: { name: 'Lechuga', price: 0.5, height: 0.12, color: '#55a620', roughness: 0.7, metalness: 0 },
   bacon: { name: 'Tocino', price: 1.5, height: 0.08, color: '#822416', roughness: 0.6, metalness: 0.1, clearcoat: 0.3 },
+  pickle: { name: 'Pepinillo', price: 0.5, height: 0.1, color: '#4a7c29', roughness: 0.4, metalness: 0, clearcoat: 0.2 },
+  onion: { name: 'Cebolla', price: 0.5, height: 0.08, color: '#eef2f3', roughness: 0.2, metalness: 0, transmission: 0.8, thickness: 0.2, ior: 1.2 },
+  ketchup: { name: 'Ketchup', price: 0.2, height: 0.05, color: '#b30000', roughness: 0.1, metalness: 0, clearcoat: 1.0 },
+  mustard: { name: 'Mostaza', price: 0.2, height: 0.05, color: '#d4af37', roughness: 0.2, metalness: 0, clearcoat: 0.8 },
+  mayo: { name: 'Mayonesa', price: 0.2, height: 0.05, color: '#ffffe0', roughness: 0.3, metalness: 0, clearcoat: 0.5 },
 };
