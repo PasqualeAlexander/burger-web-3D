@@ -16,11 +16,13 @@ interface Order {
   price: number;
 }
 
-const DEFAULT_INGREDIENTS: Ingredient[] = [
-  { id: '1', type: 'patty' },
-  { id: '2', type: 'cheese' },
-  { id: '3', type: 'tomato' },
-  { id: '4', type: 'lettuce' }
+const freshId = () => Math.random().toString(36).substr(2, 9)
+
+const makeDefaultIngredients = (): Ingredient[] => [
+  { id: freshId(), type: 'patty' },
+  { id: freshId(), type: 'cheese' },
+  { id: freshId(), type: 'tomato' },
+  { id: freshId(), type: 'lettuce' },
 ]
 
 function SortableIngredient({ ing, removeIngredient }: { ing: Ingredient, removeIngredient: (id: string) => void }) {
@@ -66,7 +68,7 @@ function SortableIngredient({ ing, removeIngredient }: { ing: Ingredient, remove
 }
 
 function App() {
-  const [ingredients, setIngredients] = useState<Ingredient[]>(DEFAULT_INGREDIENTS)
+  const [ingredients, setIngredients] = useState<Ingredient[]>(makeDefaultIngredients)
   const [cart, setCart] = useState<Order[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [showToast, setShowToast] = useState(false)
@@ -111,7 +113,7 @@ function App() {
     setIsExploding(true)
     setTimeout(() => {
       setIsExploding(false)
-      setIngredients(DEFAULT_INGREDIENTS)
+      setIngredients(makeDefaultIngredients())
     }, 900)
 
     setShowToast(true)
