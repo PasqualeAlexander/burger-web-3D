@@ -120,14 +120,20 @@ function App() {
       
       {/* 3D Canvas Area */}
       <div className="flex-1 relative cursor-grab active:cursor-grabbing">
-        <Canvas camera={{ position: [0, 2, 6], fov: 45 }}>
-          <Environment preset="city" />
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[10, 10, 5]} intensity={1.5} />
+        <Canvas shadows camera={{ position: [0, 2, 7], fov: 45 }}>
+          <Environment preset="apartment" />
+          <ambientLight intensity={0.4} />
+          <directionalLight 
+            position={[5, 10, 5]} 
+            intensity={1.2} 
+            castShadow 
+            shadow-mapSize={[1024, 1024]}
+            shadow-bias={-0.0001}
+          />
           
           <Burger ingredients={ingredients} />
           
-          <ContactShadows position={[0, -1, 0]} opacity={0.6} scale={10} blur={2} />
+          <ContactShadows position={[0, -0.7, 0]} opacity={0.7} scale={15} blur={2.5} far={4} color="#000000" />
           <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2 + 0.1} minPolarAngle={Math.PI / 6} />
         </Canvas>
         
