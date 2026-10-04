@@ -1,19 +1,29 @@
 import { useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, ShoppingCart, X, Check } from 'lucide-react'
 import { Burger } from './components/Burger'
 import { INGREDIENT_DATA } from './types'
 import type { Ingredient, IngredientType } from './types'
 
+interface Order {
+  id: string;
+  ingredients: Ingredient[];
+  price: number;
+}
+
+const DEFAULT_INGREDIENTS: Ingredient[] = [
+  { id: '1', type: 'patty' },
+  { id: '2', type: 'cheese' },
+  { id: '3', type: 'tomato' },
+  { id: '4', type: 'lettuce' }
+]
 
 function App() {
-  const [ingredients, setIngredients] = useState<Ingredient[]>([
-    { id: '1', type: 'patty' },
-    { id: '2', type: 'cheese' },
-    { id: '3', type: 'tomato' },
-    { id: '4', type: 'lettuce' }
-  ])
+  const [ingredients, setIngredients] = useState<Ingredient[]>(DEFAULT_INGREDIENTS)
+  const [cart, setCart] = useState<Order[]>([])
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [showToast, setShowToast] = useState(false)
 
   const addIngredient = (type: IngredientType) => {
     setIngredients((prev) => [
@@ -26,7 +36,23 @@ function App() {
     setIngredients((prev) => prev.filter((ing) => ing.id !== id))
   }
 
-  const totalPrice = ingredients.reduce((sum, ing) => sum + INGREDIENT_DATA[ing.type].price, 5.0) // 5.0 base price (buns)
+  const totalPrice = ingredients.reduce((sum, ing) => sum + INGREDIENT_DATA[ing.type].price, 5.0)
+
+  const handleConfirmOrder = () => {
+    const newOrder: Order = {
+      id: Math.random().toString(36).substr(2, 9),
+      ingredients: [...ingredients],
+      price: totalPrice
+    }
+    setCart((prev) => [...prev, newOrder])
+    setIngredients(DEFAULT_INGREDIENTS) // Reset to default burger
+    
+    // Show toast temporarily
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 3000)
+  }
+
+  const cartTotal = cart.reduce((sum, order) => sum + order.price, 0)
 
   return (
     <div className="flex w-full h-screen bg-neutral-900 text-white overflow-hidden font-sans">
@@ -44,12 +70,92 @@ function App() {
           <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2 + 0.1} minPolarAngle={Math.PI / 6} />
         </Canvas>
         
-        <div className="absolute top-6 left-6 pointer-events-none">
+        {/* Title */}
+        <div className="absolute top-6 left-6 pointer-events-none z-10">
           <h1 className="text-4xl font-black uppercase tracking-tighter text-amber-400 drop-shadow-lg">
             Burger Builder
           </h1>
           <p className="text-neutral-400 font-medium">Diseña tu obra maestra (Arrastra para rotar)</p>
         </div>
+
+        {/* Cart Button */}
+        <div className="absolute top-6 right-6 z-10">
+          <button 
+            onClick={() => setIsCartOpen(true)}
+            className="relative p-4 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95"
+          >
+            <ShoppingCart className="text-amber-400" size={24} />
+            {cart.length > 0 && (
+              <span className="absolute -top-2 -right-2 w-6 h-6 bg-amber-500 text-neutral-900 font-black text-sm rounded-full flex items-center justify-center shadow-lg">
+                {cart.length}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Success Toast */}
+        {showToast && (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-full font-bold shadow-2xl flex items-center gap-2 animate-bounce z-20">
+            <Check size={20} />
+            ¡Hamburguesa agregada al carrito!
+          </div>
+        )}
+
+        {/* Cart Modal Overlay */}
+        {isCartOpen && (
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <div className="bg-neutral-800 border border-neutral-700 w-full max-w-lg rounded-3xl shadow-2xl flex flex-col max-h-[80vh] overflow-hidden">
+              <div className="p-6 border-b border-neutral-700 flex justify-between items-center bg-neutral-800">
+                <h2 className="text-2xl font-bold flex items-center gap-3">
+                  <ShoppingCart className="text-amber-400" />
+                  Tu Pedido
+                </h2>
+                <button onClick={() => setIsCartOpen(false)} className="text-neutral-400 hover:text-white transition-colors">
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {cart.length === 0 ? (
+                  <div className="text-center text-neutral-500 py-10">
+                    Tu carrito está vacío. ¡Arma una hamburguesa!
+                  </div>
+                ) : (
+                  cart.map((order, i) => (
+                    <div key={order.id} className="bg-neutral-700/50 p-4 rounded-xl border border-neutral-600">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-bold text-lg text-amber-400">Hamburguesa #{i + 1}</span>
+                        <span className="font-bold">${order.price.toFixed(2)}</span>
+                      </div>
+                      <p className="text-sm text-neutral-400 leading-relaxed">
+                        Pan, {order.ingredients.map(ing => INGREDIENT_DATA[ing.type].name).join(', ')}, Pan
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {cart.length > 0 && (
+                <div className="p-6 bg-neutral-900 border-t border-neutral-700">
+                  <div className="flex justify-between items-center mb-6">
+                    <span className="text-xl text-neutral-400">Total a pagar:</span>
+                    <span className="text-3xl font-black text-amber-400">${cartTotal.toFixed(2)}</span>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      alert('¡Redirigiendo a la pasarela de pago (Simulada)!')
+                      setCart([])
+                      setIsCartOpen(false)
+                    }}
+                    className="w-full py-4 bg-amber-500 text-neutral-900 font-black text-lg rounded-xl hover:bg-amber-400 active:scale-[0.98] transition-all"
+                  >
+                    Ir a Pagar
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* UI Sidebar */}
@@ -59,7 +165,7 @@ function App() {
         <div className="p-6 border-b border-neutral-700 bg-neutral-800">
           <h2 className="text-2xl font-bold">Tu Selección</h2>
           <div className="flex justify-between items-center mt-2">
-            <span className="text-neutral-400">Total:</span>
+            <span className="text-neutral-400">Precio actual:</span>
             <span className="text-3xl font-black text-amber-400">${totalPrice.toFixed(2)}</span>
           </div>
         </div>
@@ -100,7 +206,7 @@ function App() {
 
         {/* Add Ingredients */}
         <div className="p-6 bg-neutral-900 border-t border-neutral-700">
-          <h3 className="text-sm font-semibold uppercase text-neutral-500 mb-4">Agregar</h3>
+          <h3 className="text-sm font-semibold uppercase text-neutral-500 mb-4">Agregar Extras</h3>
           <div className="grid grid-cols-2 gap-3">
             {(Object.entries(INGREDIENT_DATA) as [IngredientType, typeof INGREDIENT_DATA[IngredientType]][]).map(([type, data]) => (
               <button
@@ -117,8 +223,11 @@ function App() {
             ))}
           </div>
           
-          <button className="w-full mt-6 py-4 bg-amber-500 text-neutral-900 font-black text-lg rounded-xl hover:bg-amber-400 active:scale-[0.98] transition-all">
-            Confirmar Pedido
+          <button 
+            onClick={handleConfirmOrder}
+            className="w-full mt-6 py-4 bg-amber-500 text-neutral-900 font-black text-lg rounded-xl hover:bg-amber-400 active:scale-[0.98] transition-all"
+          >
+            Agregar al Carrito
           </button>
         </div>
 
