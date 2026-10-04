@@ -140,7 +140,7 @@ function App() {
         {/* Title */}
         <div className="absolute top-6 left-6 pointer-events-none z-10">
           <h1 className="text-4xl font-black uppercase tracking-tighter text-amber-400 drop-shadow-lg">
-            Burger Builder
+            Pasquale Burger
           </h1>
           <p className="text-neutral-400 font-medium">Diseña tu obra maestra (Arrastra para rotar)</p>
         </div>
