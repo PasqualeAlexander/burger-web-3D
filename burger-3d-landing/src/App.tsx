@@ -72,6 +72,7 @@ function App() {
   const [cart, setCart] = useState<Order[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [showToast, setShowToast] = useState(false)
+  const [burgerKey, setBurgerKey] = useState(0)
 
   const addIngredient = (type: IngredientType) => {
     setIngredients((prev) => [
@@ -114,6 +115,7 @@ function App() {
     setTimeout(() => {
       setIsExploding(false)
       setIngredients(makeDefaultIngredients())
+      setBurgerKey(k => k + 1) // forces full remount of Burger → clean drop-in
     }, 900)
 
     setShowToast(true)
@@ -141,7 +143,7 @@ function App() {
             shadow-bias={-0.0001}
           />
           
-          <Burger ingredients={ingredients} isExploding={isExploding} />
+          <Burger key={burgerKey} ingredients={ingredients} isExploding={isExploding} />
           
           <ContactShadows position={[0, -0.7, 0]} opacity={0.7} scale={15} blur={2.5} far={4} color="#000000" />
           <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2 + 0.1} minPolarAngle={Math.PI / 6} />
