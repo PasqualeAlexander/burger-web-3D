@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei'
-import { Plus, Trash2, ShoppingCart, X, Check } from 'lucide-react'
+import { Plus, Trash2, ShoppingCart, X, Check, GripVertical } from 'lucide-react'
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core'
+import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { Burger } from './components/Burger'
 import { INGREDIENT_DATA } from './types'
 import type { Ingredient, IngredientType } from './types'
@@ -18,6 +21,48 @@ const DEFAULT_INGREDIENTS: Ingredient[] = [
   { id: '3', type: 'tomato' },
   { id: '4', type: 'lettuce' }
 ]
+
+function SortableIngredient({ ing, removeIngredient }: { ing: Ingredient, removeIngredient: (id: string) => void }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: ing.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const data = INGREDIENT_DATA[ing.type]
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className="flex items-center justify-between p-3 bg-neutral-700 rounded-lg border border-neutral-600 relative bg-neutral-700/90 z-10"
+    >
+      <div className="flex items-center gap-3">
+        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-neutral-500 hover:text-white p-1 -ml-1">
+          <GripVertical size={18} />
+        </div>
+        <div className="w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: data.color }} />
+        <span className="font-semibold">{data.name}</span>
+      </div>
+      <div className="flex items-center gap-4">
+        <span className="text-amber-400 font-medium">+${data.price.toFixed(2)}</span>
+        <button 
+          onClick={() => removeIngredient(ing.id)}
+          className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded transition-colors"
+        >
+          <Trash2 size={18} />
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function App() {
   const [ingredients, setIngredients] = useState<Ingredient[]>(DEFAULT_INGREDIENTS)
@@ -36,6 +81,19 @@ function App() {
     setIngredients((prev) => prev.filter((ing) => ing.id !== id))
   }
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setIngredients((items) => {
+        const visualItems = [...items].reverse();
+        const oldIndex = visualItems.findIndex((i) => i.id === active.id);
+        const newIndex = visualItems.findIndex((i) => i.id === over.id);
+        const newVisualItems = arrayMove(visualItems, oldIndex, newIndex);
+        return newVisualItems.reverse();
+      });
+    }
+  }
+
   const totalPrice = ingredients.reduce((sum, ing) => sum + INGREDIENT_DATA[ing.type].price, 5.0)
 
   const handleConfirmOrder = () => {
@@ -45,14 +103,16 @@ function App() {
       price: totalPrice
     }
     setCart((prev) => [...prev, newOrder])
-    setIngredients(DEFAULT_INGREDIENTS) // Reset to default burger
+    setIngredients(DEFAULT_INGREDIENTS)
     
-    // Show toast temporarily
     setShowToast(true)
     setTimeout(() => setShowToast(false), 3000)
   }
 
   const cartTotal = cart.reduce((sum, order) => sum + order.price, 0)
+  
+  // UI list is rendered top-to-bottom, so we reverse the underlying bottom-to-top array
+  const visualIngredients = [...ingredients].reverse();
 
   return (
     <div className="flex w-full h-screen bg-neutral-900 text-white overflow-hidden font-sans">
@@ -178,26 +238,15 @@ function App() {
             Pan Superior
           </div>
 
-          {[...ingredients].reverse().map((ing) => {
-            const data = INGREDIENT_DATA[ing.type]
-            return (
-              <div key={ing.id} className="flex items-center justify-between p-3 bg-neutral-700 rounded-lg border border-neutral-600">
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 rounded-full" style={{ backgroundColor: data.color }} />
-                  <span className="font-semibold">{data.name}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-amber-400 font-medium">+${data.price.toFixed(2)}</span>
-                  <button 
-                    onClick={() => removeIngredient(ing.id)}
-                    className="p-1 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={visualIngredients.map(i => i.id)} strategy={verticalListSortingStrategy}>
+              <div className="space-y-3">
+                {visualIngredients.map((ing) => (
+                  <SortableIngredient key={ing.id} ing={ing} removeIngredient={removeIngredient} />
+                ))}
               </div>
-            )
-          })}
+            </SortableContext>
+          </DndContext>
 
           <div className="p-3 bg-neutral-700/30 rounded-lg text-center text-sm font-medium text-neutral-400 border border-neutral-700/50">
             Pan Inferior ($5.00)
@@ -215,7 +264,7 @@ function App() {
                 className="flex items-center justify-between p-3 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg transition-colors group"
               >
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: data.color }} />
+                  <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: data.color }} />
                   <span className="font-medium text-sm text-neutral-300 group-hover:text-white">{data.name}</span>
                 </div>
                 <Plus size={16} className="text-neutral-500 group-hover:text-amber-400" />
