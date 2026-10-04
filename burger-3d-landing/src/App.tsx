@@ -116,10 +116,10 @@ function App() {
   const visualIngredients = [...ingredients].reverse();
 
   return (
-    <div className="flex w-full h-screen bg-neutral-900 text-white overflow-hidden font-sans">
+    <div className="flex flex-col md:flex-row w-full h-screen bg-neutral-900 text-white overflow-hidden font-sans">
       
       {/* 3D Canvas Area */}
-      <div className="flex-1 relative cursor-grab active:cursor-grabbing">
+      <div className="flex-1 relative cursor-grab active:cursor-grabbing min-h-[40vh] md:min-h-0">
         <Canvas shadows camera={{ position: [0, 2, 7], fov: 45 }}>
           <Environment preset="apartment" />
           <ambientLight intensity={0.4} />
@@ -138,15 +138,15 @@ function App() {
         </Canvas>
         
         {/* Title */}
-        <div className="absolute top-6 left-6 pointer-events-none z-10">
-          <h1 className="text-4xl font-black uppercase tracking-tighter text-amber-400 drop-shadow-lg">
+        <div className="absolute top-4 left-4 md:top-6 md:left-6 pointer-events-none z-10">
+          <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-amber-400 drop-shadow-lg">
             Pasquale Burger
           </h1>
-          <p className="text-neutral-400 font-medium">Diseña tu obra maestra (Arrastra para rotar)</p>
+          <p className="text-xs md:text-sm text-neutral-400 font-medium">Diseña tu obra maestra (Arrastra para rotar)</p>
         </div>
 
         {/* Cart Button */}
-        <div className="absolute top-6 right-6 z-10">
+        <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10">
           <button 
             onClick={() => setIsCartOpen(true)}
             className="relative p-4 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95"
@@ -226,7 +226,7 @@ function App() {
       </div>
 
       {/* UI Sidebar */}
-      <div className="w-[400px] bg-neutral-800 shadow-2xl flex flex-col z-10 border-l border-neutral-700">
+      <div className="w-full md:w-[400px] h-[60vh] md:h-full shrink-0 bg-neutral-800 shadow-2xl flex flex-col z-10 border-t md:border-t-0 md:border-l border-neutral-700">
         
         {/* Header */}
         <div className="p-6 border-b border-neutral-700 bg-neutral-800">
