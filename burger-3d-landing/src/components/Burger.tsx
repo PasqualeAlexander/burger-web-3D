@@ -29,7 +29,7 @@ const AnimatedIngredient = ({
     }
   }, [targetY])
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (meshRef.current) {
       // Lerp to the target position
       meshRef.current.position.y = THREE.MathUtils.lerp(
@@ -115,7 +115,7 @@ export const Burger = ({ ingredients }: BurgerProps) => {
 const AnimatedIngredientBunTop = ({ targetY }: { targetY: number }) => {
   const meshRef = useRef<THREE.Mesh>(null)
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (meshRef.current) {
       meshRef.current.position.y = THREE.MathUtils.lerp(
         meshRef.current.position.y,
