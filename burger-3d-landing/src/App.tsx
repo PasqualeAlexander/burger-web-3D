@@ -163,6 +163,7 @@ function App() {
           <button 
             onClick={() => setIsCartOpen(true)}
             className="relative p-4 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95"
+            title="Ver carrito"
           >
             <ShoppingCart className="text-amber-400" size={24} />
             {cart.length > 0 && (
@@ -173,9 +174,20 @@ function App() {
           </button>
         </div>
 
+        {/* Persistent Add to Cart Button (Aligned with Cart at the bottom) */}
+        <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-10">
+          <button 
+            onClick={handleConfirmOrder}
+            className="flex items-center gap-2.5 px-5 py-3.5 md:px-6 md:py-4 bg-gradient-to-r from-amber-500 to-amber-400 text-neutral-950 font-black text-sm md:text-base rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer border border-amber-300/40 hover:brightness-105 backdrop-blur-sm"
+          >
+            <ShoppingCart size={20} className="shrink-0" />
+            <span className="font-extrabold tracking-tight">Agregar al Carrito • ${totalPrice.toFixed(2)}</span>
+          </button>
+        </div>
+
         {/* Success Toast */}
         {showToast && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-full font-bold shadow-2xl flex items-center gap-2 animate-bounce z-20">
+          <div className="absolute bottom-20 md:bottom-24 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-full font-bold shadow-2xl flex items-center gap-2 animate-bounce z-20">
             <Check size={20} />
             ¡Hamburguesa agregada al carrito!
           </div>
@@ -282,36 +294,37 @@ function App() {
           </div>
         </div>
 
-        {/* Add Ingredients - Extras balanceados */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-5 bg-neutral-900 border-t border-neutral-700 min-h-0 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-3 shrink-0">
-              <h3 className="text-xs font-bold tracking-wider uppercase text-neutral-400">
-                + Agregar Extras
-              </h3>
-              <span className="text-[11px] text-neutral-500">Haz clic para añadir</span>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-[160px] md:max-h-none pr-0.5">
-              {(Object.entries(INGREDIENT_DATA) as [IngredientType, typeof INGREDIENT_DATA[IngredientType]][]).map(([type, data]) => (
-                <button
-                  key={type}
-                  onClick={() => addIngredient(type)}
-                  className="flex items-center justify-between p-2.5 bg-neutral-800 hover:bg-neutral-750 border border-neutral-700/80 hover:border-amber-500/40 rounded-xl transition-all duration-150 group active:scale-[0.97]"
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-3 h-3 rounded-full shadow-sm shrink-0 ring-1 ring-neutral-700" style={{ backgroundColor: data.color }} />
-                    <span className="font-semibold text-xs text-neutral-300 group-hover:text-white truncate">{data.name}</span>
-                  </div>
-                  <Plus size={14} className="text-neutral-500 group-hover:text-amber-400 shrink-0 ml-1 transition-colors" />
-                </button>
-              ))}
-            </div>
+        {/* Add Ingredients - Extras balanceados con scroll propio */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-5 bg-neutral-900 border-t border-neutral-700 min-h-0 flex flex-col">
+          <div className="flex items-center justify-between mb-3 shrink-0">
+            <h3 className="text-xs font-bold tracking-wider uppercase text-neutral-400">
+              + Agregar Extras
+            </h3>
+            <span className="text-[11px] text-neutral-500">Haz clic para añadir</span>
           </div>
           
+          <div className="grid grid-cols-2 gap-2 overflow-y-auto pr-0.5">
+            {(Object.entries(INGREDIENT_DATA) as [IngredientType, typeof INGREDIENT_DATA[IngredientType]][]).map(([type, data]) => (
+              <button
+                key={type}
+                onClick={() => addIngredient(type)}
+                className="flex items-center justify-between p-2.5 bg-neutral-800 hover:bg-neutral-750 border border-neutral-700/80 hover:border-amber-500/40 rounded-xl transition-all duration-150 group active:scale-[0.97]"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-3 h-3 rounded-full shadow-sm shrink-0 ring-1 ring-neutral-700" style={{ backgroundColor: data.color }} />
+                  <span className="font-semibold text-xs text-neutral-300 group-hover:text-white truncate">{data.name}</span>
+                </div>
+                <Plus size={14} className="text-neutral-500 group-hover:text-amber-400 shrink-0 ml-1 transition-colors" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Pinned Action Button on Mobile (Always visible at the bottom) */}
+        <div className="p-4 bg-neutral-950/95 border-t border-neutral-800 shrink-0 md:hidden">
           <button 
             onClick={handleConfirmOrder}
-            className="w-full mt-4 py-3.5 bg-gradient-to-r from-amber-500 to-amber-400 text-neutral-950 font-extrabold text-base rounded-xl hover:brightness-105 active:scale-[0.98] shadow-lg shadow-amber-500/20 transition-all shrink-0 cursor-pointer"
+            className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-400 text-neutral-950 font-extrabold text-base rounded-xl hover:brightness-105 active:scale-[0.98] shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
           >
             Agregar al Carrito • ${totalPrice.toFixed(2)}
           </button>
