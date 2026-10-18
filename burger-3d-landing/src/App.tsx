@@ -45,20 +45,21 @@ function SortableIngredient({ ing, removeIngredient }: { ing: Ingredient, remove
     <div 
       ref={setNodeRef} 
       style={style} 
-      className="flex items-center justify-between p-3 bg-neutral-700 rounded-lg border border-neutral-600 relative bg-neutral-700/90 z-10"
+      className="flex items-center justify-between p-3.5 bg-neutral-700/80 hover:bg-neutral-700 rounded-xl border border-neutral-600/60 shadow-sm transition-all duration-200 relative z-10 group"
     >
       <div className="flex items-center gap-3">
-        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-neutral-500 hover:text-white p-1 -ml-1">
-          <GripVertical size={18} />
+        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-neutral-400 hover:text-white p-1 -ml-1 transition-colors">
+          <GripVertical size={20} />
         </div>
-        <div className="w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: data.color }} />
-        <span className="font-semibold">{data.name}</span>
+        <div className="w-4 h-4 rounded-full shadow-md ring-2 ring-neutral-800" style={{ backgroundColor: data.color }} />
+        <span className="font-bold text-sm md:text-base text-neutral-100 tracking-tight">{data.name}</span>
       </div>
-      <div className="flex items-center gap-4">
-        <span className="text-amber-400 font-medium">+${data.price.toFixed(2)}</span>
+      <div className="flex items-center gap-3">
+        <span className="text-amber-400 font-bold text-sm">+${data.price.toFixed(2)}</span>
         <button 
           onClick={() => removeIngredient(ing.id)}
-          className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded transition-colors"
+          className="p-1.5 text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+          title="Quitar ingrediente"
         >
           <Trash2 size={18} />
         </button>
@@ -238,28 +239,36 @@ function App() {
       </div>
 
       {/* UI Sidebar */}
-      <div className="w-full md:w-[400px] h-[60vh] md:h-full shrink-0 bg-neutral-800 shadow-2xl flex flex-col z-10 border-t md:border-t-0 md:border-l border-neutral-700">
+      <div className="w-full md:w-[440px] lg:w-[460px] h-[65vh] md:h-full shrink-0 bg-neutral-850 shadow-2xl flex flex-col z-10 border-t md:border-t-0 md:border-l border-neutral-700">
         
         {/* Header */}
-        <div className="p-6 border-b border-neutral-700 bg-neutral-800">
-          <h2 className="text-2xl font-bold">Tu Selección</h2>
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-neutral-400">Precio actual:</span>
-            <span className="text-3xl font-black text-amber-400">${totalPrice.toFixed(2)}</span>
+        <div className="p-5 md:p-6 border-b border-neutral-700 bg-neutral-800">
+          <div className="flex justify-between items-baseline">
+            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight">Tu Hamburguesa</h2>
+            <span className="text-2xl md:text-3xl font-black text-amber-400">${totalPrice.toFixed(2)}</span>
           </div>
+          <p className="text-xs text-neutral-400 mt-1">Configura las capas y añade tus ingredientes favoritos</p>
         </div>
 
-        {/* Current Stack */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-3">
-          <h3 className="text-sm font-semibold uppercase text-neutral-500 mb-4">Ingredientes ({ingredients.length})</h3>
+        {/* Current Stack - Capas de Ingredientes con mayor presencia y espacio */}
+        <div className="flex-[1.6] md:flex-[1.8] overflow-y-auto p-4 md:p-5 space-y-2.5 min-h-0 bg-neutral-800/60">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-bold tracking-wider uppercase text-amber-400/90 flex items-center gap-2">
+              <span>Capas Actuales</span>
+              <span className="bg-neutral-700 text-neutral-200 px-2 py-0.5 rounded-full text-[11px] font-bold">
+                {ingredients.length}
+              </span>
+            </h3>
+            <span className="text-[11px] text-neutral-400 font-medium">Arrastra para reordenar</span>
+          </div>
           
-          <div className="p-3 bg-neutral-700/30 rounded-lg text-center text-sm font-medium text-neutral-400 border border-neutral-700/50">
-            Pan Superior
+          <div className="py-2.5 px-3.5 bg-amber-500/10 rounded-xl text-center text-xs font-bold text-amber-300 border border-amber-500/20 shadow-xs">
+            🍞 Pan Superior con Sésamo
           </div>
 
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={visualIngredients.map(i => i.id)} strategy={verticalListSortingStrategy}>
-              <div className="space-y-3">
+              <div className="space-y-2.5 my-2">
                 {visualIngredients.map((ing) => (
                   <SortableIngredient key={ing.id} ing={ing} removeIngredient={removeIngredient} />
                 ))}
@@ -267,35 +276,44 @@ function App() {
             </SortableContext>
           </DndContext>
 
-          <div className="p-3 bg-neutral-700/30 rounded-lg text-center text-sm font-medium text-neutral-400 border border-neutral-700/50">
-            Pan Inferior ($5.00)
+          <div className="py-2.5 px-3.5 bg-amber-500/10 rounded-xl text-xs font-bold text-amber-300 border border-amber-500/20 shadow-xs flex justify-between items-center">
+            <span>🍞 Pan Inferior (Base)</span>
+            <span className="text-amber-400/90 font-bold">$5.00</span>
           </div>
         </div>
 
-        {/* Add Ingredients */}
-        <div className="p-6 bg-neutral-900 border-t border-neutral-700">
-          <h3 className="text-sm font-semibold uppercase text-neutral-500 mb-4">Agregar Extras</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {(Object.entries(INGREDIENT_DATA) as [IngredientType, typeof INGREDIENT_DATA[IngredientType]][]).map(([type, data]) => (
-              <button
-                key={type}
-                onClick={() => addIngredient(type)}
-                className="flex items-center justify-between p-3 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg transition-colors group"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: data.color }} />
-                  <span className="font-medium text-sm text-neutral-300 group-hover:text-white">{data.name}</span>
-                </div>
-                <Plus size={16} className="text-neutral-500 group-hover:text-amber-400" />
-              </button>
-            ))}
+        {/* Add Ingredients - Extras balanceados */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-5 bg-neutral-900 border-t border-neutral-700 min-h-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <h3 className="text-xs font-bold tracking-wider uppercase text-neutral-400">
+                + Agregar Extras
+              </h3>
+              <span className="text-[11px] text-neutral-500">Haz clic para añadir</span>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-[160px] md:max-h-none pr-0.5">
+              {(Object.entries(INGREDIENT_DATA) as [IngredientType, typeof INGREDIENT_DATA[IngredientType]][]).map(([type, data]) => (
+                <button
+                  key={type}
+                  onClick={() => addIngredient(type)}
+                  className="flex items-center justify-between p-2.5 bg-neutral-800 hover:bg-neutral-750 border border-neutral-700/80 hover:border-amber-500/40 rounded-xl transition-all duration-150 group active:scale-[0.97]"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-3 h-3 rounded-full shadow-sm shrink-0 ring-1 ring-neutral-700" style={{ backgroundColor: data.color }} />
+                    <span className="font-semibold text-xs text-neutral-300 group-hover:text-white truncate">{data.name}</span>
+                  </div>
+                  <Plus size={14} className="text-neutral-500 group-hover:text-amber-400 shrink-0 ml-1 transition-colors" />
+                </button>
+              ))}
+            </div>
           </div>
           
           <button 
             onClick={handleConfirmOrder}
-            className="w-full mt-6 py-4 bg-amber-500 text-neutral-900 font-black text-lg rounded-xl hover:bg-amber-400 active:scale-[0.98] transition-all"
+            className="w-full mt-4 py-3.5 bg-gradient-to-r from-amber-500 to-amber-400 text-neutral-950 font-extrabold text-base rounded-xl hover:brightness-105 active:scale-[0.98] shadow-lg shadow-amber-500/20 transition-all shrink-0 cursor-pointer"
           >
-            Agregar al Carrito
+            Agregar al Carrito • ${totalPrice.toFixed(2)}
           </button>
         </div>
 
